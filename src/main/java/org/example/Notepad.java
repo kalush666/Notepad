@@ -15,8 +15,10 @@ public class Notepad extends JFrame implements ActionListener {
 
     private static final Font MENU_FONT = new Font("Arial", Font.PLAIN, 14);
     private static final Color MENU_BAR_BACKGROUND = Color.WHITE;
-    private File currentFile; // Declare currentFile to store the file path
-    private JTextArea textArea; // Declare textArea to use in printContent and saveFile methods
+    private File currentFile;
+    private JTextArea textArea;
+    private String searchTerm;
+    private int lastSearchIndex = 0;
 
     Notepad() {
         setTitle("Notepad");
@@ -159,7 +161,8 @@ public class Notepad extends JFrame implements ActionListener {
             saveFile();
         }
     }
-    private void openFIle(){
+
+    private void openFIle() {
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -169,6 +172,49 @@ public class Notepad extends JFrame implements ActionListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void find() {
+        searchTerm = JOptionPane.showInputDialog(this, "Enter text to find:", JOptionPane.PLAIN_MESSAGE);
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            String text = textArea.getText();
+            int index = text.indexOf(searchTerm, lastSearchIndex);
+            if (index != -1) {
+                textArea.select(index, index + searchTerm.length());
+                lastSearchIndex = index + searchTerm.length();
+            } else {
+                JOptionPane.showMessageDialog(this, "No more occurrences found.");
+            }
+        }
+    }
+
+    private void findNext() {
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            lastSearchIndex = textArea.getText().indexOf(searchTerm, lastSearchIndex + 1);
+            if (lastSearchIndex >= 0) {
+                textArea.setCaretPosition(lastSearchIndex);
+                textArea.select(lastSearchIndex, lastSearchIndex + searchTerm.length());
+            } else {
+                JOptionPane.showMessageDialog(this, "No more occurrences found.");
+            }
+        } else {
+            find();
+        }
+    }
+
+    private void findPrevious() {
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            String text = textArea.getText();
+            lastSearchIndex = text.lastIndexOf(searchTerm, lastSearchIndex - 1);
+            if (lastSearchIndex >= 0) {
+                textArea.setCaretPosition(lastSearchIndex);
+                textArea.select(lastSearchIndex, lastSearchIndex + searchTerm.length());
+            } else {
+                JOptionPane.showMessageDialog(this, "No more occurrences found.");
+            }
+        } else {
+            find();
         }
     }
 
@@ -216,13 +262,13 @@ public class Notepad extends JFrame implements ActionListener {
                 // Handle Delete action
                 break;
             case "Find...":
-                // Handle Find action
+                find();
                 break;
             case "Find Next":
-                // Handle Find Next action
+                findNext();
                 break;
             case "Find Previous":
-                // Handle Find Previous action
+                findPrevious();
                 break;
             case "Replace...":
                 // Handle Replace action
