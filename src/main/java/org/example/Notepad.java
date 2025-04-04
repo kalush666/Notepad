@@ -159,6 +159,18 @@ public class Notepad extends JFrame implements ActionListener {
             saveFile();
         }
     }
+    private void openFIle(){
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            currentFile = fileChooser.getSelectedFile();
+            try (BufferedReader reader = new BufferedReader(new FileReader(currentFile))) {
+                textArea.read(reader, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -171,11 +183,7 @@ public class Notepad extends JFrame implements ActionListener {
             case "New Window":
                 break;
             case "Open...":
-                JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    // Open the selected file
-                }
+                openFIle();
                 break;
             case "Save":
                 saveFile();
